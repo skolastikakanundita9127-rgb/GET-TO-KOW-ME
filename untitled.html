@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get To Know Me - Kelompok 4</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Flex:opsz,wght@8..144,100..1000&display=swap');
+        
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .variable-proximity {
+            font-family: 'Roboto Flex', sans-serif;
+            transition: font-variation-settings 0.3s ease;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .bubble {
+            animation: float 3s ease-in-out infinite;
+            transition: all 0.3s ease;
+        }
+
+        .bubble:hover {
+            transform: scale(1.1) translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .bubble:nth-child(odd) {
+            animation-delay: -1s;
+        }
+
+        .bubble:nth-child(even) {
+            animation-delay: -2s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        .slide {
+            display: none;
+            min-height: 100vh;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        .pop-in {
+            animation: popIn 0.6s ease-out forwards;
+            opacity: 0;
+            transform: scale(0.8);
+        }
+
+        @keyframes popIn {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .member-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #F2E6EE;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .social-icon {
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .social-icon:hover {
+            background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+            transform: scale(1.2) rotate(5deg);
+        }
+
+        .quiz-option {
+            transition: all 0.3s ease;
+        }
+
+        .quiz-option:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateX(10px);
+        }
+
+        .correct {
+            background: rgba(34, 197, 94, 0.3) !important;
+            border-color: #22c55e !important;
+        }
+
+        .wrong {
+            background: rgba(239, 68, 68, 0.3) !important;
+            border-color: #ef4444 !important;
+        }
+
+        .liquid-chrome-bg {
+            background: linear-gradient(180deg, #F2E6EE 0%, #977DFF 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .liquid-chrome-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .liquid-chrome-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(242, 230, 238, 0.4) 0%, transparent 40%),
+                radial-gradient(circle at calc(100% - var(--mouse-x, 50%)) calc(100% - var(--mouse-y, 50%)), rgba(151, 125, 255, 0.3) 0%, transparent 40%),
+                radial-gradient(circle at calc(var(--mouse-x, 50%) + 20%) calc(var(--mouse-y, 50%) - 20%), rgba(242, 230, 238, 0.2) 0%, transparent 50%);
+            filter: blur(2px);
+            transition: all 0.3s ease;
+            z-index: 2;
+        }
+
+        .liquid-chrome-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        .chrome-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: radial-gradient(circle, rgba(242,230,238,0.8) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float-particle 6s ease-in-out infinite;
+        }
+
+        @keyframes float-particle {
+            0%, 100% { 
+                transform: translateY(0px) scale(1);
+                opacity: 0.3;
+            }
+            50% { 
+                transform: translateY(-20px) scale(1.2);
+                opacity: 0.8;
+            }
+        }
+
+        .floating-title {
+            animation: floatingTitle 4s ease-in-out infinite;
+        }
+
+        @keyframes floatingTitle {
+            0%, 100% { 
+                transform: translateY(0px) scale(1);
+            }
+            25% { 
+                transform: translateY(-8px) scale(1.02);
+            }
+            50% { 
+                transform: translateY(-15px) scale(1.05);
+            }
+            75% { 
+                transform: translateY(-8px) scale(1.02);
+            }
+        }
+
+        .pulsing-subtitle {
+            animation: pulsingSubtitle 3s ease-in-out infinite;
+        }
+
+        @keyframes pulsingSubtitle {
+            0%, 100% { 
+                transform: scale(1);
+                opacity: 0.9;
+            }
+            50% { 
+                transform: scale(1.08);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+    <!-- Background Music -->
+    <audio id="bgMusic" loop>
+        <source src="https://youtu.be/JOXUEZloyZE?si=NfjQPkDPUeya9nxk" type="audio/mpeg">
+    </audio>
+
+    <!-- Home Slide -->
+    <div id="home" class="slide active flex-col justify-center items-center liquid-chrome-bg">
+        <div id="liquidChromeCanvas" class="liquid-chrome-canvas"></div>
+        <div class="liquid-chrome-overlay"></div>
+        <div class="liquid-chrome-particles"></div>
+        <div class="relative z-10 text-center">
+            <h1 class="text-8xl font-bold text-gray-800 mb-4 pop-in floating-title" style="animation-delay: 0.2s; text-shadow: 2px 2px 4px rgba(255,255,255,0.8), 0 0 20px rgba(255,255,255,0.6);">Get To Know Me</h1>
+            <h2 class="text-4xl font-medium text-gray-700 mb-12 pop-in pulsing-subtitle" style="animation-delay: 0.4s; text-shadow: 1px 1px 2px rgba(255,255,255,0.8);">Kelompok 4</h2>
+            
+            <div class="flex flex-wrap justify-center gap-8 max-w-5xl mx-auto px-4">
+                <!-- Nundi -->
+                <div class="bubble glass rounded-3xl p-6 cursor-pointer member-card" onclick="showMemberHome('nundi')">
+                    <img src="https://i.pinimg.com/1200x/c0/9e/16/c09e165be0e93e1739beeb80e4c2a2a2.jpg" alt="Nundi" class="member-avatar mx-auto mb-4">
+                    <h3 class="text-gray-800 font-semibold text-xl" style="text-shadow: 1px 1px 2px rgba(255,255,255,0.8);">Nundi</h3>
+                </div>
+                
+                <!-- Nana -->
+                <div class="bubble glass rounded-3xl p-6 cursor-pointer member-card" onclick="showMemberHome('nana')">
+                    <img src="https://i.pinimg.com/736x/c7/da/62/c7da621795ea538f5116823566a57bde.jpg" alt="Nana" class="member-avatar mx-auto mb-4">
+                    <h3 class="text-gray-800 font-semibold text-xl" style="text-shadow: 1px 1px 2px rgba(255,255,255,0.8);">Nana</h3>
+                </div>
+                
+                <!-- Kheisya -->
+                <div class="bubble glass rounded-3xl p-6 cursor-pointer member-card" onclick="showMemberHome('kheisya')">
+                    <img src="https://i.pinimg.com/736x/31/23/5b/31235ba84b0eefe258d581c7dd8429eb.jpg" alt="Kheisya" class="member-avatar mx-auto mb-4">
+                    <h3 class="text-gray-800 font-semibold text-xl" style="text-shadow: 1px 1px 2px rgba(255,255,255,0.8);">Kheisya</h3>
+                </div>
+                
+                <!-- Nayla -->
+                <div class="bubble glass rounded-3xl p-6 cursor-pointer member-card" onclick="showMemberHome('nayla')">
+                    <img src="https://i.pinimg.com/1200x/35/d6/83/35d683fd5417870aebd6c45898f39ca2.jpg" alt="Nayla" class="member-avatar mx-auto mb-4">
+                    <h3 class="text-gray-800 font-semibold text-xl" style="text-shadow: 1px 1px 2px rgba(255,255,255,0.8);">Nayla</h3>
+                </div>
+                
+                <!-- Rafa -->
+                <div class="bubble glass rounded-3xl p-6 cursor-pointer member-card" onclick="showMemberHome('rafa')">
+                    <img src="https://i.pinimg.com/1200x/58/72/7c/58727cfc2dac9e8f0b77a7cab7abf073.jpg" alt="Rafa" class="member-avatar mx-auto mb-4">
+                    <h3 class="text-gray-800 font-semibold text-xl" style="text-shadow: 1px 1px 2px rgba(255,255,255,0.8);">Rafa</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nundi Member Home -->
+    <div id="nundi-home" class="slide flex-col justify-center items-center gradient-bg">
+        <div class="container mx-auto px-4 py-8">
+            <div class="flex flex-col lg:flex-row items-center justify-center gap-12">
+                <!-- Profile Photo -->
+                <div class="bubble">
+                    <img src="https://i.pinimg.com/1200x/c0/9e/16/c09e165be0e93e1739beeb80e4c2a2a2.jpg" alt="Nundi" class="w-80 h-80 rounded-full object-cover border-8 shadow-2xl" style="border-color: #F2E6EE;">
+                </div>
+                
+                <!-- Welcome Text -->
+                <div class="text-center lg:text-left">
+                    <h1 class="text-5xl font-bold text-white mb-6">Halo! Aku Nundi! 👋</h1>
+                    <p class="text-xl text-white mb-8 max-w-md">Yuk kenalan lebih dekat denganku! Ada banyak hal seru yang bisa kamu temukan tentang diriku. Siap-siap terkejut! ✨</p>
+                </div>
+            </div>
+            
+            <!-- Menu Bubbles -->
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-6 max-w-4xl mx-auto mt-12">
+                <div class="bubble glass rounded-3xl p-6 cursor-pointer text-center" onclick="showSlide('nundi-about')">
+                    <div class="text-4xl mb-3">👤</div>
+                    <h3 class="text-white font-semibold">About Me</h3>
+                </div>
+                
+                <div class="bubble glass rounded-3xl p-6 cursor-pointer text-center" onclick="showSlide('nundi-hobbies')">
+                    <div class="text-4xl mb-3">🎭</div>
+                    <h3 class="text-white font-semibold">Hobbies</h3>
+                </div>
+                
+                <div class="bubble glass rounded-3xl p-6 cursor-pointer text-center" onclick="showSlide('nundi-funfact')">
+                    <div class="text-4xl mb-3">⚡</div>
+                    <h3 class="text-white font-semibold">Fun Fact</h3>
+                </div>
+                
+                <div class="bubble glass rounded-3xl p-6 cursor-pointer text-center" onclick="showSlide('nundi-portfolio')">
+                    <div class="text-4xl mb-3">🎨</div>
+                    <h3 class="text-white font-semibold">Portfolio</h3>
+                </div>
+                
+                <div class="bubble glass rounded-3xl p-6 cursor-pointer text-center" onclick="showSlide('nundi-social')">
+                    <div class="text-4xl mb-3">📱</div>
+                    <h3 class="text-white font-semibold">Social Media</h3>
+                </div>
+                
+                <div class="bubble glass rounded-3xl p-6 cursor-pointer text-center" onclick="showSlide('nundi-game')">
+                    <div class="text-4xl mb-3">🎮</div>
+                    <h3 class="text-white font-semibold">Mini Game</h3>
+                </div>
+            </div>
+        </div>
+        
+        <button onclick="showSlide('home')" class="fixed bottom-8 left-8 text-purple-600 px-6 py-3 rounded-full font-semibold hover:bg-purple-100 transition-all duration-300 shadow-lg z-50" style="background-color: #F2E6EE;">
+            🏠 Back to Home
+        </button>
+    </div>
+
+    <!-- Nundi About Me -->
+    <div id="nundi-about" class="slide flex-col justify-center items-center" style="background-image: url('https://i.pinimg.com/736x/8d/4d/8c/8d4d8c621674afec6cb775138c315500.jpg');">
+        <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+        
+        <!-- Menu Bubbles at Top -->
+        <div class="w-full px-4 py-6 relative z-10">
+            <div class="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto">
+                <div class="bubble glass rounded-3xl px-6 py-3 cursor-pointer text-center hover:scale-110 transition-all duration-300" onclick="showSlide('nundi-about')">
+                    <span class="text-white font-semibold">About Me</span>
+                </div>
+                
+                <div class="bubble glass rounded-3xl px-6 py-3 cursor-pointer text-center hover:scale-110 transition-all duration-300" onclick="showSlide('nundi-hobbies')">
+                    <span class="text-white font-semibold">Hobbies</span>
+                </div>
+                
+                <div class="bubble glass rounded-3xl px-6 py-3 cursor-pointer text-center hover:scale-110 transition-all duration-300" onclick="showSlide('nundi-funfact')">
+                    <span class="text-white font-semibold">Fun Fact</span>
+                </div>
+                
+                <div class="bubble glass rounded-3xl px-6 py-3 cursor-pointer text-center hover:scale-110 transition-all duration-300" onclick="showSlide('nundi-portfolio')">
+                    <span class="text-white font-semibold">Portfolio</span>
+                </div>
+                
+                <div class="bubble glass rounded-3xl px-6 py-3 cursor-pointer text-center hover:scale-110 transition-all duration-300" onclick="showSlide('nundi-social')">
+                    <span class="text-white font-semibold">Social Media</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="relative z-10 container mx-auto px-4 py-8 flex-1 flex flex-col justify-center">
+            <h1 class="text-5xl font-bold text-white text-center mb-12">About Me</h1>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+                <div class="bubble glass rounded-3xl p-6 text-center pop-in" style="animation-delay: 0.1s;">
+                    <div class="text-3xl mb-3">👤</div>
+                    <h3 class="text-white font-semibold mb-2">Nama</h3>
+                    <p class="text-white">Skolastika Kanundita</p>
+                </div>
+                
+                <div class="bubble glass rounded-3xl p-6 text-center pop-in" style="animation-delay: 0.2s;">
+                    <div class="text-3xl mb-3">🏫</div>
+                    <h3 class="text-white font-semibold mb-2">Universitas</h3>
+                    <p class="text-white">Universitas Indonesia</p>
+                </div>
+                
+                <div class="bubble glass rounded-3xl p-6 text-center pop-in" style="animation-delay: 0.3s;">
+                    <div class="text-3xl mb-3">📚</div>
+                    <h3 class="text-white font-semibold mb-2">Jurusan</h3>
+                    <p class="text-white">Periklanan Kreatif</p>
+                </div>
+                
+                <div class="bubble glass rounded-3xl p-6 text-center pop-in" style="animation-delay: 0.4s;">
+                    <div class="text-3xl mb-3">🎂</div>
+                    <h3 class="text-white font-semibold mb-2">Tempat, Tanggal Lahir</h3>
+                    <p class="text-white">Tangerang, 9 Januari 2007</p>
+                </div>
+                
+                <div class="bubble glass rounded-3xl p-6 text-center pop-in" style="animation-delay: 0.5s;">
+                    <div class="text-3xl mb-3">🧠</div>
+                    <h3 class="text-white font-semibold mb-2">MBTI</h3>
+                    <p class="text-white">INFP</p>
+                </div>
+                
+                <div class="bubble glass rounded-3xl p-6 text-center pop-in" style="animation-delay: 0.6s;">
+                    <div class="text-3xl mb-3">♑</div>
+                    <h3 class="text-white font-semibold mb-2">Zodiac</h3>
+                    <p class="text-white">Capricorn</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="fixed bottom-8 left-8 flex gap-4 z-50">
+            <button onclick="showSlide('nundi-home')" class="text-purple-600 px-6 py-3 rounded-full font-semibold hover:bg-purple-100 transition-all duration-300 shadow-lg" style="background-color: #F2E6EE;">
+                🏠 Home
+            </button>
+            <button onclick="showSlide('nundi-hobbies')" class="bg-purple-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-purple-700 transition-all duration-300 shadow-lg">
+                Next: Hobbies →
+            </button>
+        </div>
+    </div>
+
+    <!-- Nundi Hobbies -->
+    <div id="nundi-hobbies" class="slide flex-col justify-center items-center" style="background-image: url('https://i.pinimg.com/1200x/97/53/d0/9753d0c273acd5225f0858c87508c76b.jpg');">
+        <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+        
+        <!-- Menu Bubbles at Top -->
+        <div class="w-full px-4 py-6 relative z-10">
+            <div class="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto">
+                <div class="bubble glass rounded-3xl px-6 py-3 cursor-pointer text-center hover:scale-110 transition-all duration-300" onclick="showSlide('nundi-about')">
+                    <span class="text-white font-semibold">About Me</span>
+                </div>
+                
+                <div class="bubble glass rounded-3xl px-6 py-3 cursor-pointer text-center hover:scale-110 transition-all duration-300" onclick="showSlide('nundi-hobbies')">
+                    <span class="text-white font-semibold">Hobbies</span>
+                </div>
+                
+                <div class="bubble glass rounded-3xl px-6 py-3 cursor-pointer text-center hover:scale-110 transition-all duration-300" onclick="showSlide('nundi-funfact')">
+                    <span class="text-white font-semibold">Fun Fact</span>
+                </div>
+                
+                <div class="bubble glass rounded-3xl px-6 py-3 cursor-pointer text-center hover:scale-110 transition-all duration-300" onclick="showSlide('nundi-portfolio')">
+                    <span class="text-white font-semibold">Portfolio</span>
+                </div>
+                
+                <div class="bubble glass rounded-3xl px-6 py-3 cursor-pointer text-center hover:scale-110 transition-all duration-300" onclick="showSlide('nundi-social')">
+                    <span class="text-white font-semibold">Social Media</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="relative z-10 container mx-auto px-4 py-8 flex-1 flex flex-col justify-center">
+            <h1 class="text-5xl font-bold text-white text-center mb-12">Nundi's Hobby</h1>
+            
+            <div class="max-w-4xl mx-auto">
+                <div class="bubble glass rounded-3xl p-8 mb-8 text-center pop-in">
+                    <div class="text-4xl mb-4">📺</div>
+                    <h2 class="text-3xl font-bold text-white mb-4">Menonton Netflix</h2>
+                </div>
+                
+                <div class="bubble glass rounded-3xl p-6 mb-8 text-center pop-in" style="animation-delay: 0.2s;">
+                    <h3 class="text-2xl font-bold text-white mb-4">Genre Kesukaan:</h3>
+                    <p class="text-xl text-white">Romance, Thriller, Comedy</p>
+                </div>
+                
+                <h3 class="text-3xl font-bold text-white text-center mb-8">Film/Series Favorit:</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bubble glass rounded-3xl p-6 text-center pop-in" style="animation-delay: 0.4s;">
+                        <img src="https://i.pinimg.com/736x/4c/4b/98/4c4b98007a2a461483eba8aebff1e43a.jpg" alt="When I Fly Towards You" class="w-full h-64 object-cover rounded-2xl mb-4">
+                        <h4 class="text-white font-semibold">When I Fly Towards You</h4>
+                    </div>
+                    
+                    <div class="bubble glass rounded-3xl p-6 text-center pop-in" style="animation-delay: 0.6s;">
+                        <img src="https://i.pinimg.com/736x/cb/a7/4e/cba74e3fc9949fbc36201789f378e131.jpg" alt="Love Untangled" class="w-full h-64 object-cover rounded-2xl mb-4">
+                        <h4 class="text-white font-semibold">Love Untangled</h4>
+                    </div>
+                    
+                    <div class="bubble glass rounded-3xl p-6 text-center pop-in" style="animation-delay: 0.8s;">
+                        <img src="https://i.pinimg.com/736x/af/52/81/af52811842380a09cc250209f393c223.jpg" alt="A Killer Paradox" class="w-full h-64 object-cover rounded-2xl mb-4">
+                        <h4 class="text-white font-semibold">A Killer Paradox</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="fixed bottom-8 left-8 flex gap-4 z-50">
+            <button onclick="showSlide('nundi-home')" class="text-purple-600 px-6 py-3 rounded-full font-semibold hover:bg-purple-100 transition-all duration-300 shadow-lg" style="background-color: #F2E6EE;">
+                🏠 Home
+            </button>
+            <button onclick="showSlide('nundi-funfact')" class="bg-purple-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-purple-700 transition-all duration-300 shadow-lg">
+                Next: Fun Fact →
+            </button>
+        </div>
+    </div>
+
+    <!-- Nundi Fun Fact -->
+    <div id="nundi-funfact" class="slide flex-col justify-center items-center gradient-bg">
+        <!-- Menu Bubbles at Top -->
+        <div class="w-full px-4 py-6 relative z-10">
+            <div class="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto">
+                <div class="bubble glass rounded-3xl px-6 py-3 cursor-pointer text-center hover:scale-110 transition-all duration-300" onclick="showSlide('nundi-about')">
+                    <span class="text-white font-semibold">About Me</span>
+                </div>
+                
+                <div class="bubble glass rounded-3xl px-6 py-3 cursor-pointer text-center hover:scale-110 transition-all duration-300" onclick="showSlide('nundi-hobbies')">
+                    <span class="text-white font-semibold">Hobbies</span>
+                </div>
+                
+                <div class="bubble glass rounded-3xl px-6 py-3 cursor-pointer text-center hover:scale-110 transition-all duration-300" onclick="showSlide('nundi-funfact')">
+                    <span class="text-white font-semibold">Fun Fact</span>
+                </div>
+                
+                <div class="bubble glass rounded-3xl px-6 py-3 cursor-pointer text-center hover:scale-110 transition-all duration-300" onclick="showSlide('nundi-portfolio')">
+                    <span class="text-white font-semibold">Portfolio</span>
+                </div>
+                
+                <div class="bubble glass rounded-3xl px-6 py-3 cursor-pointer text-center hover:scale-110 transition-all duration-300" onclick="showSlide('nundi-social')">
+                    <span class="text-white font-semibold">Social Media</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="container mx-auto px-4 py-8 text-center flex-1 flex flex-col justify-center">
+            <h1 class="text-6xl font-bold text-white mb-12 pop-in">Fun Fact Nundi</h1>
+            
+            <div class="max-w-4xl mx-auto space-y-8">
+                <div class="bubble glass rounded-3xl p-8 pop-in" style="animation-delay: 0.2s;">
+                    <div class="text-6xl mb-6">👯‍♀️</div>
+                    <h2 class="text-4xl font-bold text-white mb-4">Anak Kembar!</h2>
+                    <p class="text-xl text-white mb-6">Aku punya kembaran identik yang beda cuman 3 menit. Namanya Lala, bukan Ipin ya! 😄</p>
+                    
+                    <div class="flex justify-center gap-6 mb-6">
+                        <img src="https://i.pinimg.com/736x/d5/3e/f7/d53ef79c0baa50b61d6d4ad700bf48ec.jpg" alt="Nundi & Lala 1" class="w-32 h-32 object-cover rounded-2xl">
+                        <img src="https://i.pinimg.com/736x/b3/2a/d7/b32ad7ee938401c31f7bc74aabb706f9.jpg" alt="Nundi & Lala 2" class="w-32 h-32 object-cover rounded-2xl">
+                    </div>
+                </div>
+                
+                <div class="bubble glass rounded-3xl p-8 pop-in" style="animation-delay: 0.4s;">
+                    <h3 class="text-3xl font-bold text-white mb-6">Walaupun kita kembar, kita itu beda!</h3>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-white">
+                            <thead>
+                                <tr class="border-b border-white/30">
+                                    <th class="text-left py-3 px-4 text-xl font-bold">Nundi</th>
+                                    <th class="text-center py-3 px-4 text-xl">VS</th>
+                                    <th class="text-right py-3 px-4 text-xl font-bold">Lala</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-lg">
+                                <tr class="border-b border-white/20">
+                                    <td class="py-3 px-4">✅ Suka ikan</td>
+                                    <td class="text-center py-3 px-4">🐟</td>
+                                    <td class="py-3 px-4 text-right">❌ Tidak suka ikan</td>
+                                </tr>
+                                <tr class="border-b border-white/20">
+                                    <td class="py-3 px-4">❌ Tidak suka ati ampela</td>
+                                    <td class="text-center py-3 px-4">🍗</td>
+                                    <td class="py-3 px-4 text-right">✅ Suka ati ampela</td>
+                                </tr>
+                                <tr class="border-b border-white/20">
+                                    <td class="py-3 px-4">✅ Suka susu kedelai</td>
+                                    <td class="text-center py-3 px-4">🥛</td>
+                                    <td class="py-3 px-4 text-right">❌ Tidak suka susu kedelai</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-3 px-4">❌ Tidak suka terong</td>
+                                    <td class="text-center py-3 px-4">🍆</td>
+                                    <td class="py-3 px-4 text-right">✅ Suka terong</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="fixed bottom-8 left-8 flex gap-4 z-50">
+            <button onclick="showSlide('nundi-home')" class="text-purple-600 px-6 py-3 rounded-full font-semibold hover:bg-purple-100 transition-all duration-300 shadow-lg" style="background-color: #F2E6EE;">
+                🏠 Home
+            </button>
+            <button onclick="showSlide('nundi-portfolio')" class="bg-purple-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-purple-700 transition-all duration-300 shadow-lg">
+                Next: Portfolio →
+            </button>
+        </div>
+    </div>
+
+    <!-- Nundi Portfolio -->
+    <div id="nundi-portfolio" class="slide flex-col justify-center items-center gradient-bg">
+        <!-- Menu Bubbles at Top -->
+        <div class="w-full px-4 py-6 relative z-10">
+            <div class="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto">
+                <div class="bubble glass rounded-3xl px-6 py-3 cursor-pointer text-center hover:scale-110 transition-all duration-300" onclick="showSlide('nundi-about')">
+                    <span class="text-white font-semibold">About Me</span>
+                </div>
+                
+                <div class="bubble glass rounded-3xl px-6 py-3 cursor-pointer text-center hover:scale-110 transition-all duration-300" onclick="showSlide('nundi-hobbies')">
+                    <span class="text-white font-semibold">Hobbies</span>
+                </div>
+                
+                <div class="bubble glass rounded-3xl px-6 py-3 cursor-pointer text-center hover:scale-110 transition-all duration-300" onclick="showSlide('nundi-funfact')">
+                    <span class="text-white font-semibold">Fun Fact</span>
+                </div>
+                
+                <div class="bubble glass rounded-3xl px-6 py-3 cursor-pointer text-center hover:scale-110 transition-all duration-300" onclick="showSlide('nundi-portfolio')">
+                    <span class="text-white font-semibold">Portfolio</span>
+                </div>
+                
+                <div class="bubble glass rounded-3xl px-6 py-3 cursor-pointer text-center hover:scale-110 transition-all duration-300" onclick="showSlide('nundi-social')">
+                    <span class="text-white font-semibold">Social Media</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="container mx-auto px-4 py-8 flex-1 flex flex-col justify-center">
+            <h1 class="text-5xl font-bold text-white text-center mb-12">Portfolio</h1>
+            
+            <div class="max-w-6xl mx-auto space-y-8">
+                <!-- Experience -->
+                <div class="bubble glass rounded-3xl p-8 pop-in" style="animation-delay: 0.1s;">
+                    <h2 class="text-3xl font-bold text-white mb-6 text-center">💼 Experience</h2>
+                    <h3 class="text-xl font-semibold text-white mb-4">Marketing Communication as Social Media Design Graphic</h3>
+                    <p class="text-white mb-6">di Universitas Multimedia Nusantara</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <img src="https://i.pinimg.com/736x/aa/26/0c/aa260c7ead434bd4bacb517e28194877.jpg" alt="Experience 1" class="w-full h-48 object-cover rounded-2xl">
+                        <img src="https://i.pinimg.com/736x/d7/e0/8e/d7e08eb18608c1b8c7f0ff425c5ac747.jpg" alt="Experience 2" class="w-full h-48 object-cover rounded-2xl">
+                        <img src="https://i.pinimg.com/736x/d2/89/78/d28978c04a959b40ee863cecca5a5faa.jpg" alt="Experience 3" class="w-full h-48 object-cover rounded-2xl">
+                    </div>
+                </div>
+                
+                <!-- Design Projects -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bubble glass rounded-3xl p-6 pop-in" style="animation-delay: 0.2s;">
+                        <h3 class="text-2xl font-bold text-white mb-4">🪧 Design Signage</h3>
+                        <img src="https://i.pinimg.com/736x/fa/02/43/fa0243bff49c5c0a0ec90b05c3542111.jpg" alt="Design Signage" class="w-full h-48 object-cover rounded-2xl mb-4">
+                        <p class="text-white">Membuat design signage untuk acara</p>
+                    </div>
+                    
+                    <div class="bubble glass rounded-3xl p-6 pop-in" style="animation-delay: 0.3s;">
+                        <h3 class="text-2xl font-bold text-white mb-4">🏷️ Design Nametag</h3>
+                        <img src="https://i.pinimg.com/736x/c3/a3/27/c3a327bc51ae2fa70d135cf7edd92897.jpg" alt="Design Nametag" class="w-full h-48 object-cover rounded-2xl mb-4">
+                        <p class="text-white">Membuat design name tag untuk keperluan ospek</p>
+                    </div>
+                </div>
+                
+                <!-- Instagram Feed Design -->
+                <div class="bubble glass rounded-3xl p-8 pop-in" style="animation-delay: 0.4s;">
+                    <h3 class="text-2xl font-bold text-white mb-6 text-center">📱 Design Feed Instagram</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="text-center">
+                            <img src="https://i.pinimg.com/736x/92/56/6f/92566fcedf71e134077ddbe637807e3d.jpg" alt="Instagram Feed 1" class="w-full h-64 object-cover rounded-2xl mb-4">
+                            <p class="text-white">Design untuk kebutuhan promosi di Instagram @universitasmultimedianusantara</p>
+                        </div>
+                        <div class="text-center">
+                            <img src="https://i.pinimg.com/736x/12/13/7d/12137dabf04b947e126d3d0b74d19503.jpg" alt="Instagram Feed 2" class="w-full h-64 object-cover rounded-2xl mb-4">
+                            <p class="text-white">Design untuk kebutuhan promosi di Instagram @umnonlinelearning</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Software -->
+                <div class="bubble glass rounded-3xl p-8 pop-in" style="animation-delay: 0.5s;">
+                    <h3 class="text-2xl font-bold text-white mb-6 text-center">🛠️ Software</h3>
+                    <div class="flex justify-center gap-8 flex-wrap">
+                        <div class="text-center">
+                            <img src="https://i.pinimg.com/1200x/e5/35/6c/e5356c9766b49e62e80a631f821611dd.jpg" alt="Adobe Illustrator" class="w-20 h-20 object-cover rounded-2xl mx-auto mb-2">
+                            <p class="text-white font-semibold">Adobe Illustrator</p>
+                        </div>
+                        <div class="text-center">
+                            <img src="https://i.pinimg.com/736x/e4/47/21/e447213471d6d45c4cc661ccf7d120ae.jpg" alt="Canva" class="w-20 h-20 object-cover rounded-2xl mx-auto mb-2">
+                            <p class="text-white font-semibold">Canva</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-20 h-20 bg-blue-600 rounded-2xl mx-auto mb-2 flex items-center justify-center">
+                                <span class="text-white font-bold text-sm">PS</span>
+                            </div>
+                            <p class="text-white font-semibold">Photoshop</p>
+                        </div>
+                        <div class="text-center">
+                            <img src="https://i.pinimg.com/736x/c4/10/c7/c410c7c8c7bb31013500d214a7da8a8b.jpg" alt="CapCut" class="w-20 h-20 object-cover rounded-2xl mx-auto mb-2">
+                            <p class="text-white font-semibold">CapCut</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="fixed bottom-8 left-8 flex gap-4 z-50">
+            <button onclick="showSlide('nundi-home')" class="text-purple-600 px-6 py-3 rounded-full font-semibold hover:bg-purple-100 transition-all duration-300 shadow-lg" style="background-color: #F2E6EE;">
+                🏠 Home
+            </button>
+            <button onclick="showSlide('nundi-social')" class="bg-purple-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-purple-700 transition-all duration-300 shadow-lg">
+                Next: Social Media →
+            </button>
+        </div>
+    </div>
+
+    <!-- Nundi Social Media -->
+    <div id="nundi-social" class="slide flex-col justify-center items-center gradient-bg">
+        <!-- Menu Bubbles at Top -->
+        <div class="w-full px-4 py-6 relative z-10">
+            <div class="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto">
+                <div class="bubble glass rounded-3xl px-6 py-3 cursor-pointer text-center hover:scale-110 transition-all duration-300" onclick="showSlide('nundi-about')">
+                    <span class="text-white font-semibold">About Me</span>
+                </div>
+                
+                <div class="bubble glass rounded-3xl px-6 py-3 cursor-pointer text-center hover:scale-110 transition-all duration-300" onclick="showSlide('nundi-hobbies')">
+                    <span class="text-white font-semibold">Hobbies</span>
+                </div>
+                
+                <div class="bubble glass rounded-3xl px-6 py-3 cursor-pointer text-center hover:scale-110 transition-all duration-300" onclick="showSlide('nundi-funfact')">
+                    <span class="text-white font-semibold">Fun Fact</span>
+                </div>
+                
+                <div class="bubble glass rounded-3xl px-6 py-3 cursor-pointer text-center hover:scale-110 transition-all duration-300" onclick="showSlide('nundi-portfolio')">
+                    <span class="text-white font-semibold">Portfolio</span>
+                </div>
+                
+                <div class="bubble glass rounded-3xl px-6 py-3 cursor-pointer text-center hover:scale-110 transition-all duration-300" onclick="showSlide('nundi-social')">
+                    <span class="text-white font-semibold">Social Media</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="container mx-auto px-4 py-8 text-center flex-1 flex flex-col justify-center">
+            <h1 class="text-5xl font-bold text-white mb-12">Social Media</h1>
+            
+            <div class="flex flex-wrap justify-center gap-8 max-w-2xl mx-auto">
+                <a href="https://www.instagram.com/dayysoo_/" class="social-icon bubble glass rounded-3xl p-8 block hover:scale-125 transition-all duration-500" target="_blank" rel="noopener noreferrer">
+                    <svg class="w-16 h-16 mx-auto mb-4" fill="#E4405F" viewBox="0 0 24 24">
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                    </svg>
+                    <span class="text-white font-semibold">Instagram</span>
+                </a>
+                
+                <a href="https://www.tiktok.com/@nundayyy" class="social-icon bubble glass rounded-3xl p-8 block hover:scale-125 transition-all duration-500" target="_blank" rel="noopener noreferrer">
+                    <svg class="w-16 h-16 mx-auto mb-4" fill="#FF0050" viewBox="0 0 24 24">
+                        <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+                    </svg>
+                    <span class="text-white font-semibold">TikTok</span>
+                </a>
+                
+                <a href="https://www.linkedin.com/in/skolastikakanundita/" class="social-icon bubble glass rounded-3xl p-8 block hover:scale-125 transition-all duration-500" target="_blank" rel="noopener noreferrer">
+                    <svg class="w-16 h-16 mx-auto mb-4" fill="#0077B5" viewBox="0 0 24 24">
+                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                    </svg>
+                    <span class="text-white font-semibold">LinkedIn</span>
+                </a>
+            </div>
+        </div>
+        
+        <div class="fixed bottom-8 left-8 flex gap-4 z-50">
+            <button onclick="showSlide('nundi-home')" class="text-purple-600 px-6 py-3 rounded-full font-semibold hover:bg-purple-100 transition-all duration-300 shadow-lg" style="background-color: #F2E6EE;">
+                🏠 Home
+            </button>
+            <button onclick="showSlide('nundi-game')" class="bg-purple-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-purple-700 transition-all duration-300 shadow-lg">
+                Next: Mini Game →
+            </button>
+        </div>
+    </div>
+
+    <!-- Nundi Mini Game -->
+    <div id="nundi-game" class="slide flex-col justify-center items-center gradient-bg">
+        <!-- Menu Bubbles at Top -->
+        <div class="w-full px-4 py-6 relative z-10">
+            <div class="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto">
+                <div class="bubble glass rounded-3xl px-6 py-3 cursor-pointer text-center hover:scale-110 transition-all duration-300" onclick="showSlide('nundi-about')">
+                    <span class="text-white font-semibold">About Me</span>
+                </div>
+                
+                <div class="bubble glass rounded-3xl px-6 py-3 cursor-pointer text-center hover:scale-110 transition-all duration-300" onclick="showSlide('nundi-hobbies')">
+                    <span class="text-white font-semibold">Hobbies</span>
+                </div>
+                
+                <div class="bubble glass rounded-3xl px-6 py-3 cursor-pointer text-center hover:scale-110 transition-all duration-300" onclick="showSlide('nundi-funfact')">
+                    <span class="text-white font-semibold">Fun Fact</span>
+                </div>
+                
+                <div class="bubble glass rounded-3xl px-6 py-3 cursor-pointer text-center hover:scale-110 transition-all duration-300" onclick="showSlide('nundi-portfolio')">
+                    <span class="text-white font-semibold">Portfolio</span>
+                </div>
+                
+                <div class="bubble glass rounded-3xl px-6 py-3 cursor-pointer text-center hover:scale-110 transition-all duration-300" onclick="showSlide('nundi-social')">
+                    <span class="text-white font-semibold">Social Media</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="container mx-auto px-4 py-8 text-center flex-1 flex flex-col justify-center">
+            <h1 class="text-5xl font-bold text-white mb-12">Mini Game: Tebak Fakta Nundi!</h1>
+            
+            <div class="max-w-2xl mx-auto">
+                <div id="quiz-container" class="bubble glass rounded-3xl p-8">
+                    <div id="question-counter" class="text-white mb-4 text-lg">Pertanyaan <span id="current-question">1</span> dari 5</div>
+                    
+                    <div id="question-container">
+                        <h2 id="question" class="text-2xl font-bold text-white mb-8">Apa MBTI Nundi?</h2>
+                        
+                        <div id="options-container" class="space-y-4">
+                            <button class="quiz-option w-full glass rounded-2xl p-4 text-white font-semibold border-2 border-transparent" onclick="checkAnswer(this, false)">ENFP</button>
+                            <button class="quiz-option w-full glass rounded-2xl p-4 text-white font-semibold border-2 border-transparent" onclick="checkAnswer(this, true)">INFP</button>
+                            <button class="quiz-option w-full glass rounded-2xl p-4 text-white font-semibold border-2 border-transparent" onclick="checkAnswer(this, false)">ISFP</button>
+                            <button class="quiz-option w-full glass rounded-2xl p-4 text-white font-semibold border-2 border-transparent" onclick="checkAnswer(this, false)">ESFP</button>
+                        </div>
+                    </div>
+                    
+                    <div id="result-container" class="hidden">
+                        <div id="score-display" class="text-4xl font-bold text-white mb-4"></div>
+                        <div id="message" class="text-xl text-white mb-6"></div>
+                        <button onclick="resetQuiz()" class="text-purple-600 px-8 py-3 rounded-full font-semibold hover:bg-purple-100 transition-all duration-300" style="background-color: #F2E6EE;">Main Lagi!</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <button onclick="showSlide('nundi-home')" class="fixed bottom-8 left-8 text-purple-600 px-6 py-3 rounded-full font-semibold hover:bg-purple-100 transition-all duration-300 shadow-lg z-50" style="background-color: #F2E6EE;">
+            🏠 Back to Home
+        </button>
+    </div>
+
+    <script>
+        let currentSlide = 'home';
+        let score = 0;
+        let answered = false;
+        let currentQuestionIndex = 0;
+        
+        const quizQuestions = [
+            {
+                question: "Apa MBTI Nundi?",
+                options: ["ENFP", "INFP", "ISFP", "ESFP"],
+                correct: 1
+            },
+            {
+                question: "Apa zodiac Nundi?",
+                options: ["Aquarius", "Capricorn", "Sagittarius", "Pisces"],
+                correct: 1
+            },
+            {
+                question: "Nundi suka makanan apa yang tidak disukai kembarannya?",
+                options: ["Ikan", "Ati ampela", "Susu kedelai", "Terong"],
+                correct: 0
+            },
+            {
+                question: "Apa jurusan Nundi di universitas?",
+                options: ["Desain Grafis", "Periklanan Kreatif", "Komunikasi Visual", "Marketing"],
+                correct: 1
+            },
+            {
+                question: "Berapa selisih umur Nundi dengan kembarannya?",
+                options: ["1 menit", "3 menit", "5 menit", "10 menit"],
+                correct: 1
+            }
+        ];
+
+
+
+        function showMemberHome(member) {
+            // Add shake animation to clicked member
+            event.target.closest('.member-card').classList.add('shake');
+            
+            setTimeout(() => {
+                showSlide(`${member}-home`);
+            }, 500);
+        }
+
+        function loadQuestion() {
+            const question = quizQuestions[currentQuestionIndex];
+            document.getElementById('question').textContent = question.question;
+            document.getElementById('current-question').textContent = currentQuestionIndex + 1;
+            
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.className = 'quiz-option w-full glass rounded-2xl p-4 text-white font-semibold border-2 border-transparent';
+                button.textContent = option;
+                button.onclick = () => checkAnswer(button, index === question.correct);
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        function checkAnswer(button, isCorrect) {
+            if (answered) return;
+            
+            answered = true;
+            const options = document.querySelectorAll('.quiz-option');
+            const question = quizQuestions[currentQuestionIndex];
+            
+            if (isCorrect) {
+                button.classList.add('correct');
+                score += 20;
+            } else {
+                button.classList.add('wrong');
+                // Show correct answer
+                options[question.correct].classList.add('correct');
+            }
+            
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < quizQuestions.length) {
+                    nextQuestion();
+                } else {
+                    showResult();
+                }
+            }, 1500);
+        }
+
+        function nextQuestion() {
+            answered = false;
+            const options = document.querySelectorAll('.quiz-option');
+            options.forEach(opt => {
+                opt.classList.remove('correct', 'wrong');
+            });
+            loadQuestion();
+        }
+
+        function showResult() {
+            document.getElementById('question-counter').classList.add('hidden');
+            document.getElementById('question-container').classList.add('hidden');
+            document.getElementById('result-container').classList.remove('hidden');
+            
+            const scoreDisplay = document.getElementById('score-display');
+            const message = document.getElementById('message');
+            
+            scoreDisplay.textContent = `Skor: ${score}/100`;
+            
+            if (score === 100) {
+                message.textContent = "Wah, kamu hebat! Kamu benar-benar memperhatikan ya! 🎉";
+            } else if (score >= 60) {
+                message.textContent = "Bagus! Kamu cukup kenal sama aku! 😊";
+            } else {
+                message.textContent = "Ups! Tapi gak apa-apa, sekarang kamu udah tau lebih banyak tentang aku! 😄";
+            }
+        }
+
+        function resetQuiz() {
+            answered = false;
+            score = 0;
+            currentQuestionIndex = 0;
+            
+            document.getElementById('question-counter').classList.remove('hidden');
+            document.getElementById('question-container').classList.remove('hidden');
+            document.getElementById('result-container').classList.add('hidden');
+            
+            loadQuestion();
+        }
+
+        // Add bubble shake effect on hover
+        document.addEventListener('DOMContentLoaded', function() {
+            const bubbles = document.querySelectorAll('.bubble');
+            bubbles.forEach(bubble => {
+                bubble.addEventListener('mouseenter', function() {
+                    this.classList.add('shake');
+                });
+                
+                bubble.addEventListener('animationend', function() {
+                    this.classList.remove('shake');
+                });
+            });
+            
+            // Initialize quiz
+            loadQuestion();
+        });
+
+        // Three.js Liquid Chrome Interactive Background
+        class LiquidChrome {
+            constructor() {
+                this.container = document.getElementById('liquidChromeCanvas');
+                this.mouse = new THREE.Vector2();
+                this.amplitude = 0.6;
+                this.time = 0;
+                
+                this.init();
+                this.createShaders();
+                this.createGeometry();
+                this.setupMouseTracking();
+                this.animate();
+            }
+            
+            init() {
+                // Three.js Setup
+                this.scene = new THREE.Scene();
+                this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+                this.renderer.setClearColor(0x000000, 0);
+                this.container.appendChild(this.renderer.domElement);
+                
+                this.camera.position.z = 5;
+                
+                window.addEventListener('resize', () => this.resize());
+            }
+            
+            resize() {
+                this.camera.aspect = window.innerWidth / window.innerHeight;
+                this.camera.updateProjectionMatrix();
+                this.renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+            
+            createShaders() {
+                // Vertex Shader
+                this.vertexShader = `
+                    uniform float time;
+                    uniform vec2 mouse;
+                    uniform float amplitude;
+                    varying vec2 vUv;
+                    varying vec3 vPosition;
+                    
+                    void main() {
+                        vUv = uv;
+                        vec3 pos = position;
+                        
+                        // Liquid wave effects
+                        float wave1 = sin(pos.x * 2.0 + time) * amplitude * 0.1;
+                        float wave2 = cos(pos.y * 3.0 + time * 1.5) * amplitude * 0.1;
+                        float mouseInfluence = length(mouse - pos.xy) * 0.5;
+                        
+                        pos.z += wave1 + wave2 + sin(mouseInfluence + time) * amplitude * 0.05;
+                        
+                        vPosition = pos;
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+                    }
+                `;
+                
+                // Fragment Shader
+                this.fragmentShader = `
+                    uniform float time;
+                    uniform vec2 mouse;
+                    uniform float amplitude;
+                    varying vec2 vUv;
+                    varying vec3 vPosition;
+                    
+                    void main() {
+                        vec2 uv = vUv;
+                        
+                        // Liquid chrome waves
+                        float wave1 = sin(uv.x * 10.0 + time) * 0.5 + 0.5;
+                        float wave2 = cos(uv.y * 8.0 + time * 1.2) * 0.5 + 0.5;
+                        float wave3 = sin(length(uv - 0.5) * 15.0 - time * 2.0) * 0.5 + 0.5;
+                        
+                        // Mouse interaction effect
+                        float mouseDistance = length(mouse - vPosition.xy);
+                        float mouseEffect = 1.0 - smoothstep(0.0, 2.0, mouseDistance);
+                        
+                        // Chrome colors (pink theme)
+                        vec3 color1 = vec3(0.949, 0.902, 0.933); // Light pink #F2E6EE
+                        vec3 color2 = vec3(0.592, 0.490, 1.0); // Purple #977DFF
+                        vec3 color3 = vec3(0.95, 0.8, 0.9); // Pink-purple mix
+                        
+                        // Mix colors based on waves
+                        vec3 finalColor = mix(color1, color2, wave1);
+                        finalColor = mix(finalColor, color3, wave2 * 0.5);
+                        
+                        // Add mouse interaction glow
+                        finalColor += vec3(mouseEffect * 0.3);
+                        
+                        // Add flowing liquid effect
+                        float flow = sin(uv.x * 5.0 + time * 2.0) * cos(uv.y * 5.0 + time * 1.5);
+                        finalColor += vec3(flow * 0.1);
+                        
+                        // Calculate alpha for transparency
+                        float alpha = (wave1 + wave2 + wave3) * 0.15 + mouseEffect * 0.2 + 0.05;
+                        
+                        gl_FragColor = vec4(finalColor, alpha);
+                    }
+                `;
+            }
+            
+            createGeometry() {
+                // Create plane geometry with many vertices for smooth deformation
+                this.geometry = new THREE.PlaneGeometry(20, 20, 50, 50);
+                
+                // Create shader material
+                this.material = new THREE.ShaderMaterial({
+                    vertexShader: this.vertexShader,
+                    fragmentShader: this.fragmentShader,
+                    uniforms: {
+                        time: { value: 0 },
+                        mouse: { value: new THREE.Vector2(0, 0) },
+                        amplitude: { value: this.amplitude }
+                    },
+                    transparent: true,
+                    blending: THREE.AdditiveBlending,
+                    side: THREE.DoubleSide
+                });
+                
+                // Create mesh and add to scene
+                this.mesh = new THREE.Mesh(this.geometry, this.material);
+                this.scene.add(this.mesh);
+                
+                // Add multiple layers for depth
+                for (let i = 1; i <= 3; i++) {
+                    const layerMaterial = this.material.clone();
+                    layerMaterial.uniforms.amplitude.value = this.amplitude * (1 - i * 0.2);
+                    const layerMesh = new THREE.Mesh(this.geometry, layerMaterial);
+                    layerMesh.position.z = -i * 0.5;
+                    layerMesh.scale.set(1 + i * 0.1, 1 + i * 0.1, 1);
+                    this.scene.add(layerMesh);
+                }
+            }
+            
+            setupMouseTracking() {
+                const homeSlide = document.getElementById('home');
+                
+                homeSlide.addEventListener('mousemove', (event) => {
+                    const rect = homeSlide.getBoundingClientRect();
+                    this.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+                    this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+                    
+                    // Update shader uniforms
+                    this.material.uniforms.mouse.value.set(this.mouse.x * 5, this.mouse.y * 5);
+                    
+                    // Update overlay effect
+                    const overlay = homeSlide.querySelector('.liquid-chrome-overlay');
+                    const mouseXPercent = ((event.clientX - rect.left) / rect.width) * 100;
+                    const mouseYPercent = ((event.clientY - rect.top) / rect.height) * 100;
+                    
+                    overlay.style.setProperty('--mouse-x', mouseXPercent + '%');
+                    overlay.style.setProperty('--mouse-y', mouseYPercent + '%');
+                });
+                
+                // Create floating particles
+                this.createFloatingParticles();
+            }
+            
+            createFloatingParticles() {
+                const particlesContainer = document.querySelector('.liquid-chrome-particles');
+                
+                for (let i = 0; i < 20; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'chrome-particle';
+                    particle.style.left = Math.random() * 100 + '%';
+                    particle.style.top = Math.random() * 100 + '%';
+                    particle.style.animationDelay = Math.random() * 6 + 's';
+                    particle.style.animationDuration = (Math.random() * 4 + 4) + 's';
+                    particlesContainer.appendChild(particle);
+                }
+            }
+            
+            animate() {
+                this.time += 0.01;
+                
+                // Update shader uniforms
+                this.material.uniforms.time.value = this.time;
+                
+                // Rotate the mesh slightly for dynamic effect
+                this.mesh.rotation.z = Math.sin(this.time * 0.5) * 0.1;
+                
+                // Update all layer materials
+                this.scene.children.forEach((child, index) => {
+                    if (child.material && child.material.uniforms) {
+                        child.material.uniforms.time.value = this.time + index * 0.1;
+                        if (index > 0) {
+                            child.rotation.z = Math.sin(this.time * 0.3 + index) * 0.05;
+                        }
+                    }
+                });
+                
+                // Render the scene
+                this.renderer.render(this.scene, this.camera);
+                
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+
+        // Variable Proximity Text Effect
+        class VariableProximityText {
+            constructor() {
+                this.init();
+            }
+            
+            init() {
+                // Apply to all text elements automatically
+                this.applyToAllText();
+            }
+            
+            applyToAllText() {
+                // Select all text elements that should have the effect
+                const textSelectors = [
+                    'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 
+                    'p', 'span', 'button', 'a', 
+                    '.text-white', '.text-gray-800', '.text-gray-700',
+                    '.font-bold', '.font-semibold', '.font-medium'
+                ];
+                
+                textSelectors.forEach(selector => {
+                    const elements = document.querySelectorAll(selector);
+                    elements.forEach(element => {
+                        // Skip if already processed or if it's an icon/empty
+                        if (element.dataset.proximityProcessed || 
+                            element.textContent.trim().length === 0 ||
+                            element.textContent.match(/^[\u{1F300}-\u{1F9FF}]+$/u)) {
+                            return;
+                        }
+                        
+                        this.processTextElement(element);
+                    });
+                });
+            }
+            
+            processTextElement(element) {
+                const originalText = element.textContent.trim();
+                if (!originalText) return;
+                
+                // Mark as processed
+                element.dataset.proximityProcessed = 'true';
+                
+                // Add variable font class
+                element.classList.add('variable-proximity');
+                
+                // Create letter spans
+                const container = document.createElement('span');
+                container.setAttribute('aria-hidden', 'true');
+                
+                [...originalText].forEach((letter, index) => {
+                    const span = document.createElement('span');
+                    span.textContent = letter === ' ' ? '\u00A0' : letter;
+                    span.style.fontVariationSettings = '"wght" 400, "wdth" 100';
+                    span.style.transition = 'font-variation-settings 0.2s ease';
+                    span.style.display = 'inline-block';
+                    span.dataset.index = index;
+                    container.appendChild(span);
+                });
+                
+                // Add screen reader text
+                const srText = document.createElement('span');
+                srText.className = 'sr-only';
+                srText.textContent = originalText;
+                
+                // Replace content
+                element.innerHTML = '';
+                element.appendChild(srText);
+                element.appendChild(container);
+                
+                // Add mouse listeners
+                this.addMouseListeners(element);
+            }
+            
+            addMouseListeners(element) {
+                const letters = element.querySelectorAll('span[aria-hidden="true"] span');
+                
+                element.addEventListener('mousemove', (e) => {
+                    const rect = element.getBoundingClientRect();
+                    const mouseX = e.clientX - rect.left;
+                    const mouseY = e.clientY - rect.top;
+                    
+                    letters.forEach((letter) => {
+                        const letterRect = letter.getBoundingClientRect();
+                        const letterX = letterRect.left - rect.left + letterRect.width / 2;
+                        const letterY = letterRect.top - rect.top + letterRect.height / 2;
+                        
+                        const distance = Math.sqrt(
+                            Math.pow(mouseX - letterX, 2) + Math.pow(mouseY - letterY, 2)
+                        );
+                        
+                        // Make effect more visible with larger range and stronger effect
+                        const maxDistance = 150;
+                        const proximity = Math.max(0, 1 - distance / maxDistance);
+                        
+                        const weight = 300 + proximity * 600; // 300 to 900 (wider range)
+                        const width = 75 + proximity * 50;    // 75 to 125 (more dramatic)
+                        
+                        letter.style.fontVariationSettings = `"wght" ${weight}, "wdth" ${width}`;
+                        
+                        // Add subtle scale effect for more visibility
+                        const scale = 1 + proximity * 0.1;
+                        letter.style.transform = `scale(${scale})`;
+                    });
+                });
+                
+                element.addEventListener('mouseleave', () => {
+                    letters.forEach((letter) => {
+                        letter.style.fontVariationSettings = '"wght" 400, "wdth" 100';
+                        letter.style.transform = 'scale(1)';
+                    });
+                });
+            }
+        }
+
+        // Initialize animations
+        window.addEventListener('load', function() {
+            const popElements = document.querySelectorAll('#home .pop-in');
+            popElements.forEach((el, index) => {
+                setTimeout(() => {
+                    el.style.opacity = '1';
+                    el.style.transform = 'scale(1)';
+                }, index * 200);
+            });
+            
+            // Initialize Liquid Chrome
+            new LiquidChrome();
+            
+            // Initialize Variable Proximity Text with delay to ensure DOM is ready
+            setTimeout(() => {
+                new VariableProximityText();
+            }, 500);
+        });
+
+        // Also initialize when navigating between slides
+        function showSlide(slideId) {
+            // Hide current slide
+            document.getElementById(currentSlide).classList.remove('active');
+            
+            // Show new slide
+            document.getElementById(slideId).classList.add('active');
+            currentSlide = slideId;
+            
+            // Add pop-in animation to elements
+            setTimeout(() => {
+                const popElements = document.querySelectorAll(`#${slideId} .pop-in`);
+                popElements.forEach((el, index) => {
+                    setTimeout(() => {
+                        el.style.animationDelay = `${index * 0.1}s`;
+                        el.classList.add('pop-in');
+                    }, index * 100);
+                });
+                
+                // Re-initialize proximity text for new slide
+                setTimeout(() => {
+                    new VariableProximityText();
+                }, 200);
+            }, 100);
+        }
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9842c2b234bc3fd5',t:'MTc1ODcyMTkyOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
